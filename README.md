@@ -1,7 +1,3 @@
-Based on the commit log, here's a draft for your README file:
-
----
-
 # Bruno OID4VC Test Flow
 
 This repository contains a collection for the Bruno REST client to test OpenID for Verifiable Credentials (OID4VC) flows.
