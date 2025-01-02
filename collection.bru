@@ -1,0 +1,20 @@
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: authorization_code
+  callback_url: 
+  authorization_url: 
+  access_token_url: 
+  client_id: 
+  client_secret: 
+  scope: 
+  state: 
+  pkce: false
+}
+
+vars:pre-request {
+  agentUrl: http://localhost:3033
+  ~agentUrl: https://impala-bright-grub.ngrok-free.app
+}

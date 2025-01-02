@@ -1,0 +1,56 @@
+meta {
+  name: Generate an offer
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{agentUrl}}/v0/offers
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: KZrytiX6RXDaXIUnstjCKyr1SRIblhWi
+}
+
+body:json {
+  {
+    "offerId": "{{offerId}}"
+  }
+}
+
+script:pre-request {
+  const { v4: uuidv4 } = require('uuid');
+  
+  bru.setVar('preAuthorizedCode', uuidv4());
+}
+
+script:post-response {
+  //const bd = res.body;
+  const bd = res.getBody();
+  
+  let uri;
+  
+  if (typeof bd === "object" && Object.prototype.hasOwnProperty.call(bd, "uri")) {
+    // This seems non-standard. We should get a uri in both cases, not?
+    
+    // TODO: I have no idea how to parse an URI in bruno.
+    bru.setVar('credentialOfferURI', bd.uri.split("=")[1]);
+  } else if (typeof bd === "string" && bd.startsWith("openid-credential-offer://")) {
+    const offerURI = decodeURIComponent(bd);
+    const offerJSON = offerURI.split("=")[1];
+    const offerObj = JSON.parse(offerJSON);
+    bru.setVar('credentialOffer', offerObj);  //NOTE WE DON"T SET URI!
+    bru.setVar('issuerUrl', offerObj.credential_issuer);
+    bru.setNextRequest("Get the Credential by ID");
+  } else if (typeof bd === "string" && bd.startsWith("openid-credential-offer-uri://")) {
+    const uri = decodeURIComponent(bd);
+    bru.setVar('credentialOfferURI', uri.split("=")[1]);
+  }
+  else {
+    throw new Error(`unexpected response body: ${bd}`);
+  }
+  
+  
+}
